@@ -97,7 +97,7 @@ static struct { unsigned long u; unsigned long s; } prev[MAXCPUS];
 
 static void do_line()
 {
-    unsigned int cpul[MAXCPUS];
+    int cpul[MAXCPUS];
     for (int i=0; i<ncpus; i++)
         cpul[i]=-1;
 
@@ -142,10 +142,10 @@ static void do_line()
 
     if (ht)
     {
-        unsigned int ml = 4;
+        int ml = 4;
         for (int i=0; i<ncpus; i+=2)
         {
-            if (cpul[i]==(unsigned)-1)
+            if (cpul[i]==-1 && cpul[i+1]==-1)
                 printf("o");
             else if (!cpul[i])
                 printf("_");
@@ -155,10 +155,10 @@ static void do_line()
     }
     else
     {
-        unsigned int ml = 8;
+        int ml = 8;
         for (int i=0; i<ncpus; i++)
         {
-            if (cpul[i]==(unsigned)-1)
+            if (cpul[i]==-1)
                 printf("o");
             else if (!cpul[i])
                 printf("_");
