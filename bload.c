@@ -9,12 +9,11 @@
 
 #define MAXCPUS 4096
 static FILE *psf;
-static int ncpus;
+static int ncpus, ht;
 
 static int setl, set_max;
 static struct { int a; int b; } set[256];
 
-/*
 static int read_proc_int(const char *path)
 {
     int fd = open(path, O_RDONLY|O_CLOEXEC);
@@ -29,7 +28,6 @@ static int read_proc_int(const char *path)
     close(fd);
     return x;
 }
-*/
 
 static int read_proc_set(const char *path)
 {
@@ -142,7 +140,7 @@ static void do_line()
 ///        printf("> %u %u %lu\n", c, cpul[c], ds);
     }
 
-    if (1)
+    if (ht)
     {
         unsigned int ml = 4;
         for (int i=0; i<ncpus; i+=2)
@@ -176,6 +174,7 @@ int main(int argc, char **argv)
     if (read_proc_set("/sys/devices/system/cpu/present"))
         die("can't get list of CPUs\n");
     ncpus = set_max+1;
+    ht = read_proc_int("/sys/devices/system/cpu/smt/active")==1;
     psf = fopen("/proc/stat", "re");
     if (!psf)
         die("fopen(/proc/stat): %m\n");
