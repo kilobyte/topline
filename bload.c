@@ -7,6 +7,7 @@
 #define die(...) do {fprintf(stderr, __VA_ARGS__); exit(1);} while(0)
 #define ARRAYSZ(x) (sizeof(x)/sizeof(x[0]))
 
+#define RES 64
 #define MAXCPUS 4096
 static FILE *psf;
 static int ncpus, ht;
@@ -93,6 +94,11 @@ static void write_ht(int x, int y)
     printf("\xe2%c%c", (ch>>6)+0xA0, (ch&0x3F)|0x80);
 }
 
+static inline int step(int x, int ml)
+{
+    return (x*ml + RES/2) / RES;
+}
+
 static struct { unsigned long u; unsigned long s; } prev[MAXCPUS];
 
 static void do_line()
@@ -135,14 +141,12 @@ static void do_line()
         if (du>ds)
             die("overflow\n");
 
-#define RES 64
         cpul[c] = du*RES/(ds?ds:1);
 ///        printf("> %u %u %lu\n", c, cpul[c], ds);
     }
 
     if (ht)
     {
-        int ml = 4;
         for (int i=0; i<ncpus; i+=2)
         {
             if (cpul[i]==-1 && cpul[i+1]==-1)
@@ -150,12 +154,11 @@ static void do_line()
             else if (!cpul[i])
                 printf("_");
             else
-                write_ht((cpul[i]*ml+RES/2)/RES, (cpul[i+1]*ml+RES/2)/RES);
+                write_ht(step(cpul[i], 4), step(cpul[i+1], 4));
         }
     }
     else
     {
-        int ml = 8;
         for (int i=0; i<ncpus; i++)
         {
             if (cpul[i]==-1)
@@ -163,7 +166,7 @@ static void do_line()
             else if (!cpul[i])
                 printf("_");
             else
-                printf("%s", single[(cpul[i]*ml+RES/2)/RES]);
+                printf("%s", single[step(cpul[i], 8)]);
         }
     }
     printf("\n");
