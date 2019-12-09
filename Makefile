@@ -8,7 +8,7 @@ all: $(ALL)
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 
-bload: bload.o
+bload: bload.o disk.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:

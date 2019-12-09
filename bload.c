@@ -1,21 +1,12 @@
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdint.h>
+#include "bload.h"
 
-#define die(...) do {fprintf(stderr, __VA_ARGS__); exit(1);} while(0)
-#define ARRAYSZ(x) (sizeof(x)/sizeof(x[0]))
-
-#define RES 64
-#define MAXCPUS 4096
 static FILE *psf;
 static int ncpus, ht;
 
 static int setl, set_max;
 static struct { int a; int b; } set[256];
 
-static int read_proc_int(const char *path)
+int read_proc_int(const char *path)
 {
     int fd = open(path, O_RDONLY|O_CLOEXEC);
     if (fd==-1)
@@ -86,23 +77,31 @@ static const char *single[9] = {"_", "▁", "▂", "▃", "▄", "▅", "▆", "
 static const uint8_t bx[5] = {0, 0x40, 0x44, 0x46, 0x47};
 static const uint8_t by[5] = {0, 0x80, 0xA0, 0xB0, 0xB8};
 
-static void write_ht(int x, int y)
-{
-    if (!x && !y)
-        return (void)printf("_");
-    uint8_t ch = bx[x] + by[y];
-    printf("\xe2%c%c", (ch>>6)+0xA0, (ch&0x3F)|0x80);
-}
-
 static inline int step(int x, int ml)
 {
     return (x*ml + RES/2) / RES;
+}
+
+void write_ht(int x, int y)
+{
+    if (!x && !y)
+        return (void)printf("_");
+    if (x>RES)
+        x=RES;
+    if (y>RES)
+        y=RES;
+    x = step(x, 4);
+    y = step(y, 4);
+    uint8_t ch = bx[x] + by[y];
+    printf("\xe2%c%c", (ch>>6)+0xA0, (ch&0x3F)|0x80);
 }
 
 static struct { unsigned long u; unsigned long s; } prev[MAXCPUS];
 
 static void do_line()
 {
+    do_disks();
+
     int cpul[MAXCPUS];
     for (int i=0; i<ncpus; i++)
         cpul[i]=-1;
@@ -154,7 +153,7 @@ static void do_line()
             else if (!cpul[i])
                 printf("_");
             else
-                write_ht(step(cpul[i], 4), step(cpul[i+1], 4));
+                write_ht(cpul[i], cpul[i+1]);
         }
     }
     else
@@ -174,6 +173,8 @@ static void do_line()
 
 int main(int argc, char **argv)
 {
+    init_disks();
+
     if (read_proc_set("/sys/devices/system/cpu/present"))
         die("can't get list of CPUs\n");
     ncpus = set_max+1;
