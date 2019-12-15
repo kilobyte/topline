@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define RES 64
+#define RES 1000
 #define MAXCPUS 4096
 
 #define die(...) do {fprintf(stderr, __VA_ARGS__); exit(1);} while(0)
