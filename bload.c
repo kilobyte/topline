@@ -73,7 +73,7 @@ static int read_proc_set(const char *path)
     return 0;
 }
 
-static const char *single[9] = {"_", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"};
+static const char *single[9] = {" ", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"};
 static const uint8_t bx[5] = {0, 0x40, 0x44, 0x46, 0x47};
 static const uint8_t by[5] = {0, 0x80, 0xA0, 0xB0, 0xB8};
 
@@ -81,13 +81,15 @@ static inline int step(int x, int ml)
 {
     if (x>=RES || x<0)
         return ml;
+
+    if (x<5) // 0.5%
+        return 0;
+
     return (x*ml + RES/2) / RES;
 }
 
 void write_ht(int x, int y)
 {
-    if (!x && !y)
-        return (void)printf("_");
     if (x>RES)
         x=RES;
     if (y>RES)
@@ -152,8 +154,6 @@ static void do_line()
         {
             if (cpul[i]==-1 && cpul[i+1]==-1)
                 printf("o");
-            else if (!cpul[i])
-                printf("_");
             else
                 write_ht(cpul[i], cpul[i+1]);
         }
@@ -164,8 +164,6 @@ static void do_line()
         {
             if (cpul[i]==-1)
                 printf("o");
-            else if (!cpul[i])
-                printf("_");
             else
                 printf("%s", single[step(cpul[i], 8)]);
         }
