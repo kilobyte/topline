@@ -3,7 +3,14 @@
 #include "bload.h"
 
 #define NMAJORS 512
-typedef struct { unsigned long rd; unsigned long wr; char *name; int part; } bdevstat_t;
+typedef struct
+{
+    unsigned long rd;
+    unsigned long wr;
+    const char *name;
+    int part;
+} bdevstat_t;
+
 static bdevstat_t *bdev[NMAJORS];
 static int bdevn[NMAJORS];
 static struct timeval t0;
@@ -15,6 +22,27 @@ void init_disks()
     ds = fopen("/proc/diskstats", "re");
     if (!ds)
         die("Can't open /proc/diskstats: %m\n");
+}
+
+static const char *bdprefs[] =
+{
+    "nvme",
+    "sd",
+    "hd",
+    "mmcblk",
+    "loop",
+    "nbd",
+    "sr",
+    // pmem is usually dax, which doesn't update stats here
+    0
+};
+
+static const char *get_name(const char *inst)
+{
+    for (const char **pref=bdprefs; *pref; pref++)
+        if (!strncmp(inst, *pref, strlen(*pref)))
+            return *pref;
+    return strdup(inst);
 }
 
 void do_disks()
@@ -63,7 +91,7 @@ void do_disks()
         bdevstat_t *bs = &bdev[major][minor];
         if (!bs->name)
         {
-            bs->name=strdup(namebuf);
+            bs->name=get_name(namebuf);
             sprintf(namebuf, "/sys/dev/block/%u:%u/partition", major, minor);
             if (!access(namebuf, F_OK))
             {
@@ -82,8 +110,7 @@ void do_disks()
 
         if (prev_major != major)
         {
-            // TODO: print the device type name
-            printf(prev_major==-1 ? "(" : "≬");
+            printf(prev_major==-1 ? "%s(" : ")%s(", bs->name);
             prev_major = major;
         }
         write_ht(r, w);
