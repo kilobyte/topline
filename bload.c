@@ -79,6 +79,8 @@ static const uint8_t by[5] = {0, 0x80, 0xA0, 0xB0, 0xB8};
 
 static inline int step(int x, int ml)
 {
+    if (x>=RES || x<0)
+        return ml;
     return (x*ml + RES/2) / RES;
 }
 
