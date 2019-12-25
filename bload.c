@@ -82,10 +82,14 @@ static inline int step(int x, int ml)
     if (x>=RES || x<0)
         return ml;
 
-    if (x<5) // 0.5%
+#define SMIN 5
+#define SMAX 900
+    if (x<SMIN)
         return 0;
+    if (x>=SMAX)
+        return ml;
 
-    return (x*ml + RES/2) / RES;
+    return (x-SMIN)*(ml-1)/(SMAX-SMIN)+1;
 }
 
 void write_ht(int x, int y)
