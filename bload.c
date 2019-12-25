@@ -93,7 +93,7 @@ void write_single(int x)
     printf("%s", single[step(x, 8)]);
 }
 
-void write_ht(int x, int y)
+void write_dual(int x, int y)
 {
     if (x>RES)
         x=RES;

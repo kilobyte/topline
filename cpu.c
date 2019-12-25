@@ -56,7 +56,7 @@ void do_cpus()
             if (cpul[i]==-1 && cpul[i+1]==-1)
                 printf("o");
             else
-                write_ht(cpul[i], cpul[i+1]);
+                write_dual(cpul[i], cpul[i+1]);
         }
     }
     else

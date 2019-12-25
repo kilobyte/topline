@@ -16,7 +16,7 @@ int read_proc_int(const char *path);
 int read_proc_set(const char *path, set_t *set);
 
 void write_single(int x);
-void write_ht(int x, int y);
+void write_dual(int x, int y);
 
 void init_disks(void);
 void do_disks(void);

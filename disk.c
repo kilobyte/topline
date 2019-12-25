@@ -113,7 +113,7 @@ void do_disks()
             printf(prev_major==-1 ? "%s(" : ")%s(", bs->name);
             prev_major = major;
         }
-        write_ht(r, w);
+        write_dual(r, w);
     }
     if (prev_major!=-1)
         printf(") ");
