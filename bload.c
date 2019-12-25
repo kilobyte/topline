@@ -3,8 +3,7 @@
 static FILE *psf;
 static int ncpus, ht;
 
-static int setl, set_max;
-static struct { int a; int b; } set[256];
+typedef struct set { int a; int b; } set_t[256];
 
 int read_proc_int(const char *path)
 {
@@ -21,10 +20,10 @@ int read_proc_int(const char *path)
     return x;
 }
 
-static int read_proc_set(const char *path)
+static int read_proc_set(const char *path, set_t *set)
 {
-    setl=0;
-    set_max=-1;
+    int setl=1;
+    int set_max=-1;
 
     int fd = open(path, O_RDONLY|O_CLOEXEC);
     if (fd==-1)
@@ -38,7 +37,7 @@ static int read_proc_set(const char *path)
 
     do
     {
-        if (setl >= ARRAYSZ(set))
+        if (setl >= ARRAYSZ(*set))
             return -1;
         if (*bp<'0' || *bp>'9')
             return -1;
@@ -50,7 +49,7 @@ static int read_proc_set(const char *path)
         case ',':
             bp++;
         case 0:
-            set[setl].a=set[setl].b=x;
+            set[setl]->a=set[setl]->b=x;
             setl++;
             if (x > set_max)
                 set_max=x;
@@ -59,8 +58,8 @@ static int read_proc_set(const char *path)
             long y = strtol(bp+1, &bp, 10);
             if (y>=MAXCPUS)
                 return -1;
-            set[setl].a=x;
-            set[setl].b=y;
+            set[setl]->a=x;
+            set[setl]->b=y;
             setl++;
             if (y > set_max)
                 set_max=y;
@@ -70,6 +69,8 @@ static int read_proc_set(const char *path)
         }
     } while (*bp && *bp!='\n');
     close(fd);
+    set[0]->a=setl;
+    set[0]->b=set_max;
     return 0;
 }
 
@@ -179,9 +180,10 @@ int main(int argc, char **argv)
 {
     init_disks();
 
-    if (read_proc_set("/sys/devices/system/cpu/present"))
+    set_t set;
+    if (read_proc_set("/sys/devices/system/cpu/present", &set))
         die("can't get list of CPUs\n");
-    ncpus = set_max+1;
+    ncpus = set[0].b+1;
     ht = read_proc_int("/sys/devices/system/cpu/smt/active")==1;
     psf = fopen("/proc/stat", "re");
     if (!psf)
