@@ -76,7 +76,7 @@ void init_cpus()
     set_t set;
     if (read_proc_set("/sys/devices/system/cpu/present", &set))
         die("can't get list of CPUs\n");
-    ncpus = set[0].b+1;
+    ncpus = SET_MAX(set)+1;
     ht = read_proc_int("/sys/devices/system/cpu/smt/active")==1;
     psf = fopen("/proc/stat", "re");
     if (!psf)

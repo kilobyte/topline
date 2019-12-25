@@ -37,24 +37,27 @@ int read_proc_set(const char *path, set_t *set)
         if (*bp<'0' || *bp>'9')
             return -1;
         long x = strtol(bp, &bp, 10);
-        if (x>=MAXCPUS)
+        if (x<0 || x>=MAXCPUS)
             return -1;
         switch (*bp)
         {
         case ',':
             bp++;
         case 0:
-            set[setl]->a=set[setl]->b=x;
+        case '\n':
+            (*set)[setl].a=(*set)[setl].b=x;
             setl++;
             if (x > set_max)
                 set_max=x;
             break;
         case '-':;
             long y = strtol(bp+1, &bp, 10);
-            if (y>=MAXCPUS)
+            if (*bp==',')
+                bp++;
+            if (y<0 || y>=MAXCPUS)
                 return -1;
-            set[setl]->a=x;
-            set[setl]->b=y;
+            (*set)[setl].a=x;
+            (*set)[setl].b=y;
             setl++;
             if (y > set_max)
                 set_max=y;
@@ -64,8 +67,8 @@ int read_proc_set(const char *path, set_t *set)
         }
     } while (*bp && *bp!='\n');
     close(fd);
-    set[0]->a=setl;
-    set[0]->b=set_max;
+    SET_CNT(*set)=setl;
+    SET_MAX(*set)=set_max;
     return 0;
 }
 
