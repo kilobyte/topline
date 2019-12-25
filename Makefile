@@ -9,7 +9,7 @@ all: $(ALL)
 	$(CC) $(CFLAGS) -c $<
 *.o:	bload.h
 
-bload: bload.o disk.o
+bload: bload.o cpu.o disk.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:
