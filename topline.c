@@ -1,3 +1,7 @@
+#define _GNU_SOURCE
+#include <signal.h>
+#include <string.h>
+#include <sys/wait.h>
 #include "topline.h"
 
 int read_proc_int(const char *path)
@@ -115,16 +119,82 @@ static void do_line()
     printf("\n");
 }
 
+static volatile int done;
+
+static void sigchld(__attribute__((unused)) int dummy)
+{
+    done = 1;
+}
+
+static int out_lines;
+static int child_stdout, child_stderr;
+static int child_pid;
+
+static void do_args(char **argv)
+{
+    argv++;
+    while (*argv && **argv=='-')
+    {
+        if (!strcmp(*argv, "-l") || !strcmp(*argv, "--line-output"))
+        {
+            out_lines=1;
+            argv++;
+            continue;
+        }
+        if (!strcmp(*argv, "--"))
+            break;
+
+        die("Unknown option: '%s'\n", *argv);
+    }
+
+    if (out_lines && !*argv)
+        die("-l given but no program to run.\n");
+
+    if (*argv)
+    {
+        int s[2], e[2];
+        if (out_lines && (pipe2(s, O_CLOEXEC) || pipe2(e, O_CLOEXEC)))
+            die("pipe2: %m\n");
+        if ((child_pid=fork()) < 0)
+            die("fork: %m\n");
+        if (!child_pid)
+        {
+            if (out_lines && (dup2(s[1], 1)==-1 || dup2(e[1], 2)==-1))
+                die("dup2: %m\n");
+            execvp(*argv, argv);
+            die("Couldn't run ｢%s｣: %m\n", *argv);
+        }
+
+        if (out_lines)
+        {
+            close(s[1]);
+            close(e[1]);
+            child_stdout = s[0];
+            child_stderr = e[0];
+        }
+    }
+}
+
 int main(int argc, char **argv)
 {
     init_cpus();
     init_disks();
 
+    signal(SIGCHLD, sigchld);
+    do_args(argv);
+
     do_line();
-    while (1)
+    while (!done)
     {
         sleep(1);
         do_line();
+    }
+
+    if (child_pid)
+    {
+        int ret;
+        if (waitpid(child_pid, &ret, 0) == child_pid)
+            return WIFEXITED(ret)? WEXITSTATUS(ret) : WTERMSIG(ret)+128;
     }
     return 0;
 }
