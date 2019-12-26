@@ -1,4 +1,4 @@
-ALL=bload
+ALL=topline
 
 CC=gcc
 CFLAGS=-Wall -O2 -g
@@ -7,9 +7,9 @@ all: $(ALL)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
-*.o:	bload.h
+*.o:	topline.h
 
-bload: bload.o cpu.o disk.o
+topline: topline.o cpu.o disk.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:
