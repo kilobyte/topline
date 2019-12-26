@@ -1,7 +1,7 @@
 ALL=topline
 
 CC=gcc
-CFLAGS=-Wall -O2 -g
+CFLAGS=-Wall -Og -g
 
 all: $(ALL)
 
