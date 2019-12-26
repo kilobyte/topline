@@ -13,6 +13,9 @@
 typedef struct set { int a; int b; } set_t[256];
 #define SET_CNT(s) ((s)[0].a)
 #define SET_MAX(s) ((s)[0].b)
+#define SET_ITER(i,s) \
+    for (int e##__LINE_=1; e##__LINE_<SET_CNT(s); e##__LINE_++) \
+        for (int (i)=(s)[e##__LINE_].a; (i)<=(s)[e##__LINE_].b; (i)++)
 
 int read_proc_int(const char *path);
 int read_proc_set(const char *path, set_t *set);

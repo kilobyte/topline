@@ -1,8 +1,9 @@
+#include <string.h>
 #include "bload.h"
 
 static FILE *psf;
 static int ncpus, ht;
-
+static int cpuorder[MAXCPUS], cpunodes[MAXCPUS];
 static struct { unsigned long u; unsigned long s; } prev[MAXCPUS];
 
 void do_cpus()
@@ -49,26 +50,50 @@ void do_cpus()
 ///        printf("> %u %u %lu\n", c, cpul[c], ds);
     }
 
+    int lastnode=-1;
+    printf("(");
+
     if (ht)
     {
         for (int i=0; i<ncpus; i+=2)
         {
-            if (cpul[i]==-1 && cpul[i+1]==-1)
+            int a=cpuorder[i];
+            int b=cpuorder[i+1];
+            int n=cpunodes[a]; // inexact with odd HT, but meh
+            if (n!=lastnode)
+            {
+                if (lastnode!=-1)
+                    printf("≬");
+                lastnode=n;
+            }
+
+            if (cpul[a]==-1 && cpul[b]==-1)
                 printf("o");
             else
-                write_dual(cpul[i], cpul[i+1]);
+                write_dual(cpul[a], cpul[b]);
         }
     }
     else
     {
         for (int i=0; i<ncpus; i++)
         {
-            if (cpul[i]==-1)
+            int a=cpuorder[i];
+            int n=cpunodes[a];
+            if (n!=lastnode)
+            {
+                if (lastnode!=-1)
+                    printf("≬");
+                lastnode=n;
+            }
+
+            if (cpul[a]==-1)
                 printf("o");
             else
-                write_single(cpul[i]);
+                write_single(cpul[a]);
         }
     }
+
+    printf(")");
 }
 
 void init_cpus()
@@ -77,6 +102,48 @@ void init_cpus()
     if (read_proc_set("/sys/devices/system/cpu/present", &set))
         die("can't get list of CPUs\n");
     ncpus = SET_MAX(set)+1;
+
+    memset(cpunodes, -1, sizeof(cpunodes));
+    uint8_t taken[MAXCPUS];
+    memset(taken, 0, sizeof(taken));
+    int ntaken=0;
+
+    int max_node;
+    if (read_proc_set("/sys/devices/system/node/has_cpu", &set))
+        max_node=-1;
+    else
+    {
+        max_node=SET_MAX(set);
+        for (int n=0; n<=max_node; n++)
+        {
+            char path[64];
+            sprintf(path, "/sys/devices/system/node/node%d/cpulist", n);
+            if (!read_proc_set(path, &set))
+            {
+                SET_ITER(i, set)
+                    cpunodes[i]=n;
+                SET_ITER(i, set)
+                {
+                    if (taken[i])
+                        continue;
+                    sprintf(path, "/sys/devices/system/cpu/cpu%d/topology/thread_siblings_list", i);
+                    set_t sib;
+                    if (!read_proc_set(path, &sib))
+                        SET_ITER(j, sib)
+                            if (!taken[j])
+                            {
+                                taken[j]=1;
+                                cpuorder[ntaken++]=j;
+                            }
+                }
+            }
+        }
+    }
+
+    for (int i=0; i<MAXCPUS; i++)
+        if (!taken[i])
+            cpuorder[ntaken++]=i;
+
     ht = read_proc_int("/sys/devices/system/cpu/smt/active")==1;
     psf = fopen("/proc/stat", "re");
     if (!psf)
