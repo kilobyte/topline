@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include <errno.h>
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -119,6 +120,46 @@ static void do_line()
     printf("\n");
 }
 
+static struct linebuf
+{
+    int fd;
+    int len;
+    FILE *destf;
+    char buf[1024];
+} linebuf[2];
+
+static void copy_line(struct linebuf *restrict lb)
+{
+    int len = lb->len;
+    int r = read(lb->fd, lb->buf+len, sizeof(lb->buf)-len);
+    if (r==-1)
+        die("read: %m\n");
+    else if (!r)
+        return (void)(lb->fd=0);
+
+    len+=r;
+    char *start=lb->buf, *nl;
+    while ((nl=memchr(start, '\n', len)))
+    {
+        nl++;
+        fwrite(start, 1, nl-start, lb->destf);
+        len-= nl-start;
+        start=nl;
+    }
+    if (len >= sizeof(lb->buf)/2)
+    {
+        // break the overlong line
+        fwrite(start, 1, len, lb->destf);
+        fputc('\n', lb->destf);
+        lb->len=0;
+    }
+    else
+    {
+        memmove(lb->buf, start, len);
+        lb->len=len;
+    }
+}
+
 static volatile int done;
 
 static void sigchld(__attribute__((unused)) int dummy)
@@ -127,7 +168,6 @@ static void sigchld(__attribute__((unused)) int dummy)
 }
 
 static int out_lines;
-static int child_stdout, child_stderr;
 static int child_pid;
 
 static void do_args(char **argv)
@@ -169,8 +209,8 @@ static void do_args(char **argv)
         {
             close(s[1]);
             close(e[1]);
-            child_stdout = s[0];
-            child_stderr = e[0];
+            linebuf[0].fd = s[0]; linebuf[0].destf=stdout;
+            linebuf[1].fd = e[0]; linebuf[1].destf=stderr;
         }
     }
 }
@@ -183,11 +223,28 @@ int main(int argc, char **argv)
     signal(SIGCHLD, sigchld);
     do_args(argv);
 
-    do_line();
+    struct timeval delay={0,0};
     while (!done)
     {
-        sleep(1);
-        do_line();
+        if (!delay.tv_sec && !delay.tv_usec)
+        {
+            do_line();
+            delay.tv_sec=1;
+        }
+
+        int fds=0;
+#define NFDS (sizeof(fds)*8)
+        for (int i=0; i<ARRAYSZ(linebuf); i++)
+            if (linebuf[i].fd && linebuf[i].fd<NFDS)
+                fds|=1<<linebuf[i].fd;
+        if (select(fds?NFDS:0, (void*)&fds, 0, 0, &delay)==-1)
+        {
+            if (errno!=EINTR)
+                die("select: %m\n");
+        }
+        else for (int i=0; i<ARRAYSZ(linebuf); i++)
+            if (linebuf[i].fd && linebuf[i].fd<sizeof(fds)*8 && fds&1<<linebuf[i].fd)
+                copy_line(&linebuf[i]);
     }
 
     if (child_pid)
