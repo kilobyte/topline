@@ -175,7 +175,9 @@ static void do_args(char **argv)
     argv++;
     while (*argv && **argv=='-')
     {
-        if (!strcmp(*argv, "-l") || !strcmp(*argv, "--line-output"))
+        if (!strcmp(*argv, "-l")
+            || !strcmp(*argv, "--line-output")
+            || !strcmp(*argv, "--linearize"))
         {
             out_lines=1;
             argv++;
