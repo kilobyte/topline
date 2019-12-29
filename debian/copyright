@@ -1,0 +1,15 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: topline
+Upstream-Contact: Adam Borowski <kilobyte@angband.pl>
+Source: https://github.com/kilobyte/topline
+
+Files: *
+Copyright: 2019 Adam Borowski <kilobyte@angband.pl>
+License: GPL-2+noA
+ This software can be used under the terms of GNU General Public License,
+ version 2 or, if you choose so, any higher that is still a free software
+ license.  Of GPL variants published by FSF, only the Affero branch fails
+ that requirement as of 2019.
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".

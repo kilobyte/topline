@@ -1,0 +1,22 @@
+Source: topline
+Section: utils
+Priority: optional
+Maintainer: Adam Borowski <kilobyte@angband.pl>
+Build-Depends: debhelper-compat (= 12)
+Standards-Version: 4.4.1
+Rules-Requires-Root: no
+Homepage: https://github.com/kilobyte/topline
+Vcs-Browser: https://github.com/kilobyte/topline/tree/debian
+Vcs-Git: https://github.com/kilobyte/topline -b debian
+
+Package: topline
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: per-core/NUMA CPU and disk utilization plain-text grapher
+ This is a top-of-the-line logger of CPU usage patterns, designed for
+ machines with ca. 50-300 total hardware threads (fewer works but results
+ in a narrow graph, more requires a very wide terminal).  Every per-tick
+ sample is shown abusing Unicode characters to fit within a single line.
+ .
+ Disk usage is also shown in a similarly terse per-device way, as %
+ utilization for reads and writes.
