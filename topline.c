@@ -212,6 +212,10 @@ static void do_args(char **argv)
                     in*=60*60*24;
                 else if (!strcmp(rest, "w"))
                     in*=60*60*24*7;
+                else if (!strcmp(rest, "ms"))
+                    in/=1000;
+                else if (!strcmp(rest, "us") || !strcmp(rest, "µs") || !strcmp(rest, "μs"))
+                    in/=1000000;
                 else
                     die("Invalid suffix to -i ｢%s｣ in ｢%s｣\n", rest, arg);
             }
