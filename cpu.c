@@ -51,7 +51,7 @@ void do_cpus()
     }
 
     int lastnode=-1;
-    printf("(");
+    fprintf(log_output, "(");
 
     if (ht)
     {
@@ -63,12 +63,12 @@ void do_cpus()
             if (n!=lastnode)
             {
                 if (lastnode!=-1)
-                    printf("≬");
+                    fprintf(log_output, "≬");
                 lastnode=n;
             }
 
             if (cpul[a]==-1 && cpul[b]==-1)
-                printf("o");
+                fprintf(log_output, "o");
             else
                 write_dual(cpul[a], cpul[b]);
         }
@@ -82,18 +82,18 @@ void do_cpus()
             if (n!=lastnode)
             {
                 if (lastnode!=-1)
-                    printf("≬");
+                    fprintf(log_output, "≬");
                 lastnode=n;
             }
 
             if (cpul[a]==-1)
-                printf("o");
+                fprintf(log_output, "o");
             else
                 write_single(cpul[a]);
         }
     }
 
-    printf(")");
+    fprintf(log_output, ")");
 }
 
 void init_cpus()

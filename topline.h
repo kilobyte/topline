@@ -27,3 +27,5 @@ void init_disks(void);
 void do_disks(void);
 void init_cpus(void);
 void do_cpus(void);
+
+extern FILE* log_output;

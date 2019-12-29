@@ -5,6 +5,8 @@
 #include <sys/wait.h>
 #include "topline.h"
 
+FILE* log_output;
+
 int read_proc_int(const char *path)
 {
     int fd = open(path, O_RDONLY|O_CLOEXEC);
@@ -98,7 +100,7 @@ static inline int step(int x, int ml)
 
 void write_single(int x)
 {
-    printf("%s", single[step(x, 8)]);
+    fprintf(log_output, "%s", single[step(x, 8)]);
 }
 
 void write_dual(int x, int y)
@@ -110,14 +112,15 @@ void write_dual(int x, int y)
     x = step(x, 4);
     y = step(y, 4);
     uint8_t ch = bx[x] + by[y];
-    printf("\xe2%c%c", (ch>>6)+0xA0, (ch&0x3F)|0x80);
+    fprintf(log_output, "\xe2%c%c", (ch>>6)+0xA0, (ch&0x3F)|0x80);
 }
 
 static void do_line()
 {
     do_disks();
     do_cpus();
-    printf("\n");
+    fprintf(log_output, "\n");
+    fflush(log_output);
 }
 
 static struct linebuf
@@ -224,6 +227,22 @@ static void do_args(char **argv)
             continue;
         }
 
+        if (!strncmp(*argv, "-o", 2) || !strcmp(*argv, "--output"))
+        {
+            char *arg = (*argv)[1]=='o' && (*argv)[2] ?
+                *argv+2 : *++argv;
+            if (!arg || !*arg)
+                die("Missing argument to -o\n");
+
+            FILE *f = fopen(arg, "we");
+            if (!f)
+                die("Can't write to ｢%s｣: %m\n", arg);
+            log_output = f;
+
+            argv++;
+            continue;
+        }
+
         if (!strcmp(*argv, "--"))
             break;
 
@@ -232,6 +251,8 @@ static void do_args(char **argv)
 
     if (out_lines && !*argv)
         die("-l given but no program to run.\n");
+    // -l and -o together are of little use, but as programs behave differently
+    // when piped, not outright useless.
 
     if (*argv)
     {
@@ -260,6 +281,7 @@ static void do_args(char **argv)
 
 int main(int argc, char **argv)
 {
+    log_output = stdout;
     init_cpus();
     init_disks();
 

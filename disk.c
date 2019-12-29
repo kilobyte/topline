@@ -110,11 +110,11 @@ void do_disks()
 
         if (prev_major != major)
         {
-            printf(prev_major==-1 ? "%s(" : ")%s(", bs->name);
+            fprintf(log_output, prev_major==-1 ? "%s(" : ")%s(", bs->name);
             prev_major = major;
         }
         write_dual(r, w);
     }
     if (prev_major!=-1)
-        printf(") ");
+        fprintf(log_output, ") ");
 }
