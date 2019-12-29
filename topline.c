@@ -169,6 +169,7 @@ static void sigchld(__attribute__((unused)) int dummy)
 
 static int out_lines;
 static int child_pid;
+static struct timeval interval={1,0};
 
 static void do_args(char **argv)
 {
@@ -183,6 +184,46 @@ static void do_args(char **argv)
             argv++;
             continue;
         }
+
+        if (!strncmp(*argv, "-i", 2)
+            || !strcmp(*argv, "--interval"))
+        {
+            char *arg = (*argv)[1]=='i' && (*argv)[2] ?
+                *argv+2 : *++argv;
+            if (!arg || !*arg)
+                die("Missing argument to -i\n");
+
+            char *rest;
+            double in = strtod(arg, &rest);
+            if (arg == rest)
+                die("Invalid argument to -i ｢%s｣\n", arg);
+            if (*rest)
+            {
+                if (!strcmp(rest, "s"))
+                    ;
+                else if (!strcmp(rest, "m"))
+                    in*=60;
+                else if (!strcmp(rest, "h"))
+                    in*=60*60;
+                else if (!strcmp(rest, "d"))
+                    in*=60*60*24;
+                else if (!strcmp(rest, "w"))
+                    in*=60*60*24*7;
+                else
+                    die("Invalid suffix to -i ｢%s｣ in ｢%s｣\n", rest, arg);
+            }
+
+            int64_t i = in*1000000;
+            if (i<=0)
+                die("Interval in -i must be positive.\n");
+
+            interval.tv_sec = i/1000000;
+            interval.tv_usec = i%1000000;
+
+            argv++;
+            continue;
+        }
+
         if (!strcmp(*argv, "--"))
             break;
 
@@ -231,7 +272,7 @@ int main(int argc, char **argv)
         if (!delay.tv_sec && !delay.tv_usec)
         {
             do_line();
-            delay.tv_sec=1;
+            delay = interval;
         }
 
         int fds=0;
