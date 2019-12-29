@@ -2,8 +2,8 @@ topline
 =======
 
 This tool provides a hardcopy (ie, unadorned plain text) graph of per-CPU
-load, with hyperthread siblings being kept together, and NUMA node
-separation graphically marked.
+load, with hyperthread siblings kept together, and NUMA node separation
+graphically marked.
 
 It is optimized for modern many-core processors -- today, servers often have
 north of 100 CPUs (Xeon Scalable with 48 or 56 per socket, CL-AP up to 112
@@ -31,5 +31,5 @@ nvme(⣀⠀⠀⠀)sd(⠀) (⣿⣿⣿⣿⣿⣿⣿⣿≬⣿⣿⣿⣿⣿⣿⣿⣿�
 nvme(⣀⠀⠀⠀)sd(⠀) (⣿⣿⣿⣿⣿⣿⣿⣿≬⣾⣿⣷⣿⣷⣿⣿⣿≬⣿⣿⣿⣿⣿⣿⣿⣿≬⣿⣿⣿⣿⣿⣿⣿⣿)
 ```
 Here, after a brief underutilized warm-up bottlenecked on disk read, CPU
-parallelization becomes near-perfect, while the primary disk working at
+parallelization becomes near-perfect, while the primary disk works at
 a small fraction of its bandwidth.
