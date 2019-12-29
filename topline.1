@@ -1,0 +1,67 @@
+.TH topline 1 2019-12-29
+.SH NAME
+topline \- a disk/per-core CPU grapher/logger
+.SH SYNOPSIS
+.B topline
+[
+.I -l
+] [
+.I -i 1.0
+] [
+.I -o logfile
+] [
+.I program arg1 arg2 ...
+]
+.SH DESCRIPTION
+While programs like \fBhtop\fR can show per-core loads, they do so
+interactively.  There are loggers like \fBdstat\fR but, using numeric
+data, they have no chance to fit per-CPU information within a line on
+modern many-core processors.  Thus, \fBtopline\fR uses Unicode graphing
+symbols to squash the data into a terse, two-hyperthreads-per-char, form.
+This allows eyeballing NUMA separation, CPU hopping, etc.
+.P
+Once per second, \fBtopline\fR plots stats for that interval:
+.TP
+per every disk,
+one character with two columns of dots gives that disk's utilization time
+percentage.  The left column shows reads, the right one shows writes.  Disks
+are grouped into parenthesised groups by interface type (NVMe, SATA, eMMC,
+\...).
+.TP
+per every non-hyperthreaded CPU or a pair of hyperthreaded siblings,
+a character with one or two columns is given.  Non-HT CPUS are drawn with
+bars, HT ones with dots.  The parentheses group CPUs by their NUMA node.
+.SH OPTIONS
+.TP
+.I <program> <arg1> <arg2> ...
+Runs a program and terminates the graph once the program exits.  The graph
+still exhibits the global state of the system rather than just the program
+you chose and its children.
+.P
+If no program is given, \fBtopline\fR will keep logging forever (ie, until
+you press ^C or similar).
+.TP
+.BR -l ", " --line-output ", " --linearize
+Marshalls the program's output line-by-line, avoiding mix-ups with
+\fBtopline\fR's data.  They will be interspersed in separate lines.
+.br
+The program will know it is being piped; if you want it to believe it's ran
+on a terminal (to get colors, etc) you may use a tool like \fBpipetty\fR.
+.TP
+.BI "-i " <interval>
+Sets the interval between data samples; the default is 1s.  Floating-point
+values are allowed; the number may be suffixed by a "s" (seconds, default),
+"m" (minutes), "h" (hours), or "d" (days).
+.TP
+.BI "-o " <file> "\fR," " " --output " <file>
+Redirects \fBtopline\fR's output to the given file.  The program being ran
+can then use stdout and stderr unimpeded.
+.SH CAVEATS
+If the machine's CPUs are hyperthreaded with more than one or two per core,
+the graph won't make it obvious which columns share a core.  All siblings
+are still given consecutively, unless forced into separate NUMA nodes with
+fakenuma settings.
+.SH "SEE ALSO"
+.BR htop ,
+.BR dstat ,
+.BR VTUNE .
