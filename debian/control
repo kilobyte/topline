@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/kilobyte/topline/tree/debian
 Vcs-Git: https://github.com/kilobyte/topline -b debian
 
 Package: topline
-Architecture: any
+Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: per-core/NUMA CPU and disk utilization plain-text grapher
  This is a top-of-the-line logger of CPU usage patterns, designed for
