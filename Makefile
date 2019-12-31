@@ -9,7 +9,7 @@ all: $(ALL)
 	$(CC) $(CFLAGS) -c $<
 *.o:	topline.h
 
-topline: topline.o cpu.o disk.o
+topline: topline.o cpu.o disk.o signals.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 clean:
