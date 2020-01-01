@@ -15,7 +15,7 @@ Disk load is also shown, as % read/write utilization time.
 example
 =======
 
-A kernel compile on a 64-way 4-node box with 4 NVMe disks and one spinner:
+Start of a kernel compile on a 64-way 4-node box with 4 NVMe disks and one spinner:
 ```
 nvme(⡆⠀⠀⠀)sd(⠀) (⠀⠀⠀⠀⠀⠀⠀⠀≬⠀⠀⠀⠀⠀⠀⠀⠀≬⣀⣀⣀⣀⣀⣀⣀⣀≬⠀⠀⠀⠀⠀⠀⠀⠀)
 nvme(⡇⠀⠀⠀)sd(⠀) (⣄⣀⣀⣄⣀⣄⣀⣄≬⣀⣀⣀⣀⣄⣄⣠⣠≬⣀⣠⣀⣀⣀⣀⣀⣀≬⣀⣄⣀⣀⣀⣄⣀⣀)
