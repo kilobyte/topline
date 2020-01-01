@@ -8,7 +8,7 @@ graphically marked.
 It is optimized for modern many-core processors -- today, servers often have
 north of 100 CPUs (Xeon Scalable with 48 or 56 per socket, CL-AP up to 112
 per socket), and even fat desktops reach 64 threads.  Obviously, this makes
-**topline**'s display somewhat goofy on mobile stuff.
+**topline**'s display somewhat goofy (but functional) on mobile stuff.
 
 Disk load is also shown, as % read/write utilization time.
 
