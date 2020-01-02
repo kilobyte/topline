@@ -99,6 +99,14 @@ void do_disks()
                 continue;
             }
 
+            if (!strncmp(namebuf, "mtdblock", 8))
+            {
+                // Raw legacy MTD -- special uses only.
+                bs->name = "mtd";
+                bs->part = 1;
+                continue;
+            }
+
             bs->name=get_name(namebuf);
             sprintf(namebuf, "/sys/dev/block/%u:%u/partition", major, minor);
             if (!access(namebuf, F_OK))
