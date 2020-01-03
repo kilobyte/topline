@@ -29,3 +29,5 @@ void init_cpus(void);
 void do_cpus(void);
 
 extern FILE* log_output;
+
+void sigobit(int s);

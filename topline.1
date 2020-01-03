@@ -26,11 +26,12 @@ per every disk,
 one character with two columns of dots gives that disk's utilization time
 percentage.  The left column shows reads, the right one shows writes.  Disks
 are grouped into parenthesised groups by interface type (NVMe, SATA, eMMC,
-\...).
+\&...).
 .TP
 per every non-hyperthreaded CPU or a pair of hyperthreaded siblings,
 a character with one or two columns is given.  Non-HT CPUS are drawn with
-bars, HT ones with dots.  The parentheses group CPUs by their NUMA node.
+bars, HT ones with dots, offline cores are marked with 'o'.  The parentheses
+group CPUs by their NUMA node.
 .SH OPTIONS
 .TP
 .I <program> <arg1> <arg2> ...

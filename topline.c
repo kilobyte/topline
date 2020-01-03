@@ -320,7 +320,11 @@ int main(int argc, char **argv)
     {
         int ret;
         if (waitpid(child_pid, &ret, 0) == child_pid)
+        {
+            if (WIFSIGNALED(ret))
+                sigobit(ret);
             return WIFEXITED(ret)? WEXITSTATUS(ret) : WTERMSIG(ret)+128;
+        }
     }
     return 0;
 }

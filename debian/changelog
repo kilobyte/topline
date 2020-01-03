@@ -1,3 +1,11 @@
+topline (0.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Restrict arch to linux-any.
+  * M-A: foreign.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Fri, 03 Jan 2020 03:14:55 +0100
+
 topline (0.1-1) unstable; urgency=medium
 
   * Initial release (Closes: #947736)

@@ -7,15 +7,15 @@ graphically marked.
 
 It is optimized for modern many-core processors -- today, servers often have
 north of 100 CPUs (Xeon Scalable with 48 or 56 per socket, CL-AP up to 112
-per socket), and even fat desktops reach 64 threads.  Obviously, this makes
-**topline**'s display somewhat goofy on mobile stuff.
+per socket), and even fat desktops reach 64 threads.  It works correctly on
+machines with only a few CPUs, but the display looks very narrow.
 
 Disk load is also shown, as % read/write utilization time.
 
 example
 =======
 
-A kernel compile on a 64-way 4-node box with 4 NVMe disks and one spinner:
+Start of a kernel compile on a 64-way 4-node box with 4 NVMe disks and one spinner:
 ```
 nvme(⡆⠀⠀⠀)sd(⠀) (⠀⠀⠀⠀⠀⠀⠀⠀≬⠀⠀⠀⠀⠀⠀⠀⠀≬⣀⣀⣀⣀⣀⣀⣀⣀≬⠀⠀⠀⠀⠀⠀⠀⠀)
 nvme(⡇⠀⠀⠀)sd(⠀) (⣄⣀⣀⣄⣀⣄⣀⣄≬⣀⣀⣀⣀⣄⣄⣠⣠≬⣀⣠⣀⣀⣀⣀⣀⣀≬⣀⣄⣀⣀⣀⣄⣀⣀)

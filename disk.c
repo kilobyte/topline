@@ -91,6 +91,22 @@ void do_disks()
         bdevstat_t *bs = &bdev[major][minor];
         if (!bs->name)
         {
+            if (!strncmp(namebuf, "mmcblk", 6) && strstr(namebuf, "boot"))
+            {
+                // Early boot partitions are not marked as such.
+                bs->name = "mmcboot";
+                bs->part = 1;
+                continue;
+            }
+
+            if (!strncmp(namebuf, "mtdblock", 8))
+            {
+                // Raw legacy MTD -- special uses only.
+                bs->name = "mtd";
+                bs->part = 1;
+                continue;
+            }
+
             bs->name=get_name(namebuf);
             sprintf(namebuf, "/sys/dev/block/%u:%u/partition", major, minor);
             if (!access(namebuf, F_OK))
