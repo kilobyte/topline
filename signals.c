@@ -19,7 +19,9 @@ static const char* sigobits[NSIG]=
     [SIGPIPE]   = "Broken pipe",
     [SIGALRM]   = "Alarm clock",
     [SIGTERM]   = "Terminated",
+#ifdef SIGSTKFLT
     [SIGSTKFLT] = "Stack fault on coprocessor",
+#endif
     [SIGCHLD]   = "Child died",
     [SIGCONT]   = "Continue",
     [SIGSTOP]   = "Stopped",
