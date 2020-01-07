@@ -1,0 +1,18 @@
+#!/bin/sh
+
+cd "$AUTOPKGTEST_TMP"
+
+# The program dies on most errors, thus any output means we parsed the
+# platform's /proc and /sys files acceptably.
+
+topline dash -c 'sleep 2.5 && kill -HUP $$' 2>stderr|tee stdout
+
+if [ `wc -l <stdout` -ne 3 ]; then
+	echo >&2 Expected three lines.
+	exit 1
+fi
+if [ "$(cat stderr)" != Hangup ]; then
+	echo >&2 "Expected ｢Hangup｣, got:"
+	cat stderr >&2
+	exit 2
+fi
