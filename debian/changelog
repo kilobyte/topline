@@ -1,3 +1,10 @@
+topline (0.2-2) unstable; urgency=medium
+
+  * An autopkgtest.
+  * Fix FTBFS on mips* alpha sparc*.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Thu, 09 Jan 2020 18:04:07 +0100
+
 topline (0.2-1) unstable; urgency=medium
 
   * New upstream release.
