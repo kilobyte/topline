@@ -33,6 +33,7 @@ static const char *bdprefs[] =
     "loop",
     "nbd",
     "sr",
+    "fd",
     // pmem is usually dax, which doesn't update stats here
     0
 };
