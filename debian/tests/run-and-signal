@@ -7,8 +7,8 @@ cd "$AUTOPKGTEST_TMP"
 
 topline dash -c 'sleep 2.5 && kill -HUP $$' 2>stderr|tee stdout
 
-if [ `wc -l <stdout` -ne 3 ]; then
-	echo >&2 Expected three lines.
+if [ `wc -l <stdout` -ne 2 ]; then
+	echo >&2 Expected two lines.
 	exit 1
 fi
 if [ "$(cat stderr)" != Hangup ]; then
