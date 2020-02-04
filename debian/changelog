@@ -1,3 +1,11 @@
+topline (0.3-1) unstable; urgency=medium
+
+  * New upstream release.
+    + Includes a fix for very narrow machines, that made CPU graph broken
+      with 4 (x86) or 6 (ARM) threads or less.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Tue, 04 Feb 2020 05:18:32 +0100
+
 topline (0.2-2) unstable; urgency=medium
 
   * An autopkgtest.
