@@ -13,6 +13,7 @@ void do_cpus()
         cpul[i]=-1;
 
     char buf[4096];
+    fflush(psf);
     rewind(psf);
     if (!fgets(buf, sizeof(buf), psf))
         die("fgets(/proc/stat): %m\n");

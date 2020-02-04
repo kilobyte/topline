@@ -115,10 +115,26 @@ void write_dual(int x, int y)
     fprintf(log_output, "\xe2%c%c", (ch>>6)+0xA0, (ch&0x3F)|0x80);
 }
 
-static void do_line()
+static void do_line(int quiet)
 {
+    FILE *out;
+    if (quiet)
+    {
+        out = log_output;
+        if (!(log_output = fopen("/dev/null", "w")))
+            die("Can't open /dev/null: %m\n");
+    }
+
     do_disks();
     do_cpus();
+
+    if (quiet)
+    {
+        fclose(log_output);
+        log_output = out;
+        return;
+    }
+
     fprintf(log_output, "\n");
     fflush(log_output);
 }
@@ -292,12 +308,14 @@ int main(int argc, char **argv)
     signal(SIGCHLD, sigchld);
     do_args(argv);
 
-    struct timeval delay={0,0};
+    do_line(1);
+
+    struct timeval delay=interval;
     while (!done)
     {
         if (!delay.tv_sec && !delay.tv_usec)
         {
-            do_line();
+            do_line(0);
             delay = interval;
         }
 
