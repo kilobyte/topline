@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <syscall.h>
 #include "topline.h"
 
 #define NFDS (sizeof(long)*8)
@@ -335,7 +336,7 @@ int main(int argc, char **argv)
         for (int i=0; i<ARRAYSZ(linebuf); i++)
             if (linebuf[i].fd && linebuf[i].fd<NFDS)
                 fds|=1L<<linebuf[i].fd;
-        if (select(fds?NFDS:0, (void*)&fds, 0, 0, &delay)==-1)
+        if (syscall(SYS_pselect6, fds?NFDS:0, (void*)&fds, 0, 0, &delay, 0)==-1)
         {
             if (errno!=EINTR)
                 die("select: %m\n");
