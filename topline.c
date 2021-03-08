@@ -319,11 +319,11 @@ int main(int argc, char **argv)
             delay = interval;
         }
 
-        int fds=0;
+        long fds=0;
 #define NFDS (sizeof(fds)*8)
         for (int i=0; i<ARRAYSZ(linebuf); i++)
             if (linebuf[i].fd && linebuf[i].fd<NFDS)
-                fds|=1<<linebuf[i].fd;
+                fds|=1L<<linebuf[i].fd;
         if (select(fds?NFDS:0, (void*)&fds, 0, 0, &delay)==-1)
         {
             if (errno!=EINTR)
