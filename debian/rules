@@ -9,5 +9,5 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 	dh $@
 
 override_dh_auto_build:
-	+$(MAKE) CFLAGS="$(shell dpkg-buildflags --get CFLAGS) $(shell dpkg-buildflags --get CPPFLAGS)" \
+	 dh_auto_build -- CFLAGS="$(shell dpkg-buildflags --get CFLAGS) $(shell dpkg-buildflags --get CPPFLAGS)" \
 		LDFLAGS="$(shell dpkg-buildflags --get LDFLAGS)"
