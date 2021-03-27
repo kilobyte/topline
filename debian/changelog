@@ -1,9 +1,15 @@
-topline (0.3-1.1) UNRELEASED; urgency=medium
+topline (0.4-1) unstable; urgency=medium
 
-  * Non-maintainer upload.
-  * Fix FTCBFS: Let dh_auto_build pass cross tools to make. (Closes: #-1)
+  * New upstream bugfixes:
+    + Work around a regression in select() on glibc 2.33.
+    + Avoid a crash if a crapload of file descriptors are taken.
+    + Fix possible fdset corruption on 64-bit big-endian.
+  * Fix autopkgtest error messages being hidden by stdout mismatch.
 
- -- Helmut Grohne <helmut@subdivi.de>  Mon, 22 Mar 2021 23:06:22 +0100
+  [ Helmut Grohne ]
+  * Fix FTCBFS: Let dh_auto_build pass cross tools to make. (Closes: #985756)
+
+ -- Adam Borowski <kilobyte@angband.pl>  Sat, 27 Mar 2021 21:25:46 +0100
 
 topline (0.3-1) unstable; urgency=medium
 
