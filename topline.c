@@ -1,9 +1,13 @@
 #define _GNU_SOURCE
+#include <assert.h>
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <syscall.h>
 #include "topline.h"
+
+#define NFDS (sizeof(long)*8)
 
 FILE* log_output;
 
@@ -277,8 +281,16 @@ static void do_args(char **argv)
     if (*argv)
     {
         int s[2], e[2];
-        if (out_lines && (pipe2(s, O_CLOEXEC) || pipe2(e, O_CLOEXEC)))
-            die("pipe2: %m\n");
+        if (out_lines)
+        {
+            if (pipe2(s, O_CLOEXEC) || pipe2(e, O_CLOEXEC))
+                die("pipe2: %m\n");
+            if (s[1] >= NFDS)
+                die("bogus fd %d", s[1]);
+            if (e[1] >= NFDS)
+                die("bogus fd %d", e[1]);
+        }
+
         if ((child_pid=fork()) < 0)
             die("fork: %m\n");
         if (!child_pid)
@@ -319,12 +331,12 @@ int main(int argc, char **argv)
             delay = interval;
         }
 
-        int fds=0;
-#define NFDS (sizeof(fds)*8)
+        long fds=0;
+        static_assert(sizeof(fds)*8 >= NFDS, "FDS!=long");
         for (int i=0; i<ARRAYSZ(linebuf); i++)
             if (linebuf[i].fd && linebuf[i].fd<NFDS)
-                fds|=1<<linebuf[i].fd;
-        if (select(fds?NFDS:0, (void*)&fds, 0, 0, &delay)==-1)
+                fds|=1L<<linebuf[i].fd;
+        if (syscall(SYS_pselect6, fds?NFDS:0, (void*)&fds, 0, 0, &delay, 0)==-1)
         {
             if (errno!=EINTR)
                 die("select: %m\n");
