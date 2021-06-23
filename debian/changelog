@@ -4,6 +4,7 @@ topline (0.4-2) UNRELEASED; urgency=medium
     Repository-Browse.
   * Use canonical URL in Vcs-Git.
   * Update standards version to 4.5.1, no changes needed.
+  * Avoid explicitly specifying -Wl,--as-needed linker flag.
 
  -- Debian Janitor <janitor@jelmer.uk>  Wed, 23 Jun 2021 07:03:38 -0000
 
