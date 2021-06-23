@@ -2,6 +2,7 @@ topline (0.4-2) UNRELEASED; urgency=medium
 
   * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
     Repository-Browse.
+  * Use canonical URL in Vcs-Git.
 
  -- Debian Janitor <janitor@jelmer.uk>  Wed, 23 Jun 2021 07:03:38 -0000
 
