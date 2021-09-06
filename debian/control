@@ -2,8 +2,8 @@ Source: topline
 Section: utils
 Priority: optional
 Maintainer: Adam Borowski <kilobyte@angband.pl>
-Build-Depends: debhelper-compat (= 12)
-Standards-Version: 4.5.0
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0
 Rules-Requires-Root: no
 Homepage: https://github.com/kilobyte/topline
 Vcs-Browser: https://github.com/kilobyte/topline/tree/debian
