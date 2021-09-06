@@ -2,17 +2,17 @@
 #include <sys/time.h>
 #include "topline.h"
 
-#define NMAJORS 512
 typedef struct
 {
     unsigned long rd;
     unsigned long wr;
     const char *name;
-    int part;
+    int minor;
+    short major;
+    char part;
 } bdevstat_t;
 
-static bdevstat_t *bdev[NMAJORS];
-static int bdevn[NMAJORS];
+static bdevstat_t bdev[4096];
 static struct timeval t0;
 
 static FILE *ds;
@@ -62,6 +62,7 @@ void do_disks()
     t0 = t1;
 
     unsigned int prev_major = -1;
+    bdevstat_t *bs = &bdev[-1];
 
     while (fgets(buf, sizeof(buf), ds))
     {
@@ -75,25 +76,24 @@ void do_disks()
             die("A line of /proc/diskstats is corrupted: “%s”\n", buf);
         }
 
-        if (major>=NMAJORS || minor>NMAJORS)
+        if (major > 65535)
             die("Invalid major:minor : %u:%u\n", major, minor);
 
         if (!rd && !wr)
             continue;
 
-        if (bdevn[major] <= minor)
-        {
-            bdevstat_t *newmem = realloc(bdev[major], sizeof(bdevstat_t)*(minor+1));
-            if (!newmem)
-                die("realloc failed: %m\n");
-            memset(newmem+bdevn[major], 0, sizeof(bdevstat_t)*(minor+1-bdevn[major]));
-            bdev[major] = newmem;
-            bdevn[major] = minor+1;
-        }
-
-        bdevstat_t *bs = &bdev[major][minor];
+#define BDEND &bdev[ARRAYSZ(bdev)]
+        if (bs < BDEND && bs[1].major==major && bs[1].minor==minor)
+            bs++;
+        else for (bs = bdev; bs < BDEND; bs++)
+            if ((bs->major==major && bs->minor==minor) || !bs->name)
+                break;
+        if (bs >= BDEND)
+            die("Too many block devices.\n");
         if (!bs->name)
         {
+            bs->major = major;
+            bs->minor = minor;
             if (!strncmp(namebuf, "mmcblk", 6) && strstr(namebuf, "boot"))
             {
                 // Early boot partitions are not marked as such.
