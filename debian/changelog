@@ -1,3 +1,10 @@
+topline (0.5-1) unstable; urgency=medium
+
+  * New upstream release:
+    + Handles minor device numbers above 512.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Mon, 06 Sep 2021 04:21:30 +0200
+
 topline (0.4-1) unstable; urgency=medium
 
   * New upstream bugfixes:
