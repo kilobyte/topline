@@ -193,6 +193,7 @@ static void sigchld(__attribute__((unused)) int dummy)
 static int out_lines;
 static int child_pid;
 static struct timeval interval={1,0};
+static int dump_after;
 
 static void do_args(char **argv)
 {
@@ -267,6 +268,26 @@ static void do_args(char **argv)
             continue;
         }
 
+        if (!strncmp(*argv, "-d", 2) || !strcmp(*argv, "--dump-after")
+            || !strcmp(*argv, "--delay-dump"))
+        {
+            FILE *f = 0;
+            int fd = open("/tmp", O_CREAT|O_TMPFILE|O_CLOEXEC|O_RDWR, 0600);
+            if (fd != -1) // not all filesystems implement O_TMPFILE
+                f = fdopen(fd, "w+");
+            if (!f)
+                f = tmpfile();
+            if (!f)
+                die("Creating tmpfile failed: %m\n");
+            if (fd == -1)
+                fcntl(fileno(f), F_SETFL, O_CLOEXEC);
+            log_output = f;
+            dump_after = 1;
+
+            argv++;
+            continue;
+        }
+
         if (!strcmp(*argv, "--"))
             break;
 
@@ -277,6 +298,9 @@ static void do_args(char **argv)
         die("-l given but no program to run.\n");
     // -l and -o together are of little use, but as programs behave differently
     // when piped, not outright useless.
+
+    if (dump_after && !*argv)
+        die("-d given but no program to run.\n");
 
     if (*argv)
     {
@@ -309,6 +333,20 @@ static void do_args(char **argv)
             linebuf[1].fd = e[0]; linebuf[1].destf=stderr;
         }
     }
+}
+
+static void do_dump()
+{
+    char buf[65536];
+    size_t r;
+
+    rewind(log_output);
+    while ((r = fread(buf, 1, sizeof buf, log_output)))
+        if (fwrite(buf, 1, r, stderr) < r)
+            return; // if stderr is not available, we'd report error... where?
+
+    if (ferror(log_output))
+        die("Error while dumping graph log: %m\n");
 }
 
 int main(int argc, char **argv)
@@ -346,15 +384,19 @@ int main(int argc, char **argv)
                 copy_line(&linebuf[i]);
     }
 
+    int ret = 0;
     if (child_pid)
     {
-        int ret;
         if (waitpid(child_pid, &ret, 0) == child_pid)
         {
             if (WIFSIGNALED(ret))
                 sigobit(ret);
-            return WIFEXITED(ret)? WEXITSTATUS(ret) : WTERMSIG(ret)+128;
+            ret = WIFEXITED(ret)? WEXITSTATUS(ret) : WTERMSIG(ret)+128;
         }
     }
-    return 0;
+
+    if (dump_after)
+        do_dump();
+
+    return ret;
 }

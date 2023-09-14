@@ -58,6 +58,12 @@ values are allowed; the number may be suffixed by a "s" (seconds, default),
 .BI "-o " <file> "\fR," " " --output " <file>
 Redirects \fBtopline\fR's output to the given file.  The program being ran
 can then use stdout and stderr unimpeded.
+.TP
+.BR -d ", " --dump-after ", " --delay-dump
+Suppresses the graph output until after the program exits, then dumps the
+logged graph all at once to stderr.  Good for non-interactive builds.
+NB. ^C assumes you want to abort both the program and \fBtopline\fR, please
+kill the former some other way if that is not the case.
 .SH CAVEATS
 If the machine's CPUs are hyperthreaded with more than one or two per core,
 the graph won't make it obvious which columns share a core.  All siblings
