@@ -15,8 +15,8 @@ Multi-Arch: foreign
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: per-core/NUMA CPU and disk utilization plain-text grapher
  This is a top-of-the-line logger of CPU usage patterns, designed for
- machines with ca. 50-300 total hardware threads (fewer works but results
- in a narrow graph, more requires a very wide terminal).  Every per-tick
+ machines with a lot of cores, up to ~140 total hardware threads on an 80
+ column terminal, more if your terminal is not minimal.  Every per-tick
  sample is shown abusing Unicode characters to fit within a single line.
  .
  Disk usage is also shown in a similarly terse per-device way, as %
