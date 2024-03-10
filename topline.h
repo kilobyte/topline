@@ -7,6 +7,8 @@
 #define RES 1000
 #define MAXCPUS 4096
 
+#define NANO 1000000000LL
+
 #define die(...) do {fprintf(stderr, __VA_ARGS__); exit(1);} while(0)
 #define ARRAYSZ(x) (sizeof(x)/sizeof(x[0]))
 
