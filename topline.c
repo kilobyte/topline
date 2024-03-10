@@ -92,6 +92,9 @@ static inline int step(int x, int ml)
     if (x>=RES || x<0)
         return ml;
 
+    // Both top and bottom ranges are rigged:
+    // • anything above 0.5% means the system is not quiescent
+    // • 90% is the cut-off for the last notch
 #define SMIN 5
 #define SMAX 900
     if (x<SMIN)
