@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: topline
 Upstream-Contact: Adam Borowski <kilobyte@angband.pl>
-Source: https://github.com/kilobyte/topline
+Source: https://git.sr.ht/~kilobyte/topline
 
 Files: *
 Copyright: 2019 Adam Borowski <kilobyte@angband.pl>
