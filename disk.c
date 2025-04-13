@@ -1,5 +1,5 @@
 #include <string.h>
-#include <sys/time.h>
+#include <time.h>
 #include "topline.h"
 
 typedef struct
@@ -13,7 +13,7 @@ typedef struct
 } bdevstat_t;
 
 static bdevstat_t bdev[4096];
-static struct timeval t0;
+static struct timespec t0;
 
 static FILE *ds;
 
@@ -54,9 +54,10 @@ void do_disks()
 
     rewind(ds);
 
-    struct timeval t1;
-    gettimeofday(&t1, 0);
-    unsigned int td = (t1.tv_sec-t0.tv_sec)*1000000+t1.tv_usec-t0.tv_usec;
+    struct timespec t1;
+    if (clock_gettime(CLOCK_MONOTONIC, &t1))
+        die("Broken clock: %m\n");
+    int64_t td = (t1.tv_sec-t0.tv_sec)*NANO + t1.tv_nsec-t0.tv_nsec;
     if (!td)
         td = 1;
     t0 = t1;
@@ -122,8 +123,8 @@ void do_disks()
         else if (bs->part)
             continue;
 
-        int r = ((int64_t)rd-bs->rd)*RES*1000/td;
-        int w = ((int64_t)wr-bs->wr)*RES*1000/td;
+        int r = ((int64_t)rd-bs->rd)*RES*1000000/td;
+        int w = ((int64_t)wr-bs->wr)*RES*1000000/td;
         bs->rd = rd;
         bs->wr = wr;
 

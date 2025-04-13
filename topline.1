@@ -58,13 +58,22 @@ values are allowed; the number may be suffixed by a "s" (seconds, default),
 .BI "-o " <file> "\fR," " " --output " <file>
 Redirects \fBtopline\fR's output to the given file.  The program being ran
 can then use stdout and stderr unimpeded.
+.TP
+.BR -d ", " --dump-after ", " --delay-dump
+Suppresses the graph output until after the program exits, then dumps the
+logged graph all at once to stderr.  Good for non-interactive builds.
+NB. ^C assumes you want to abort both the program and \fBtopline\fR, please
+kill the former some other way if that is not the case.
 .SH CAVEATS
 If the machine's CPUs are hyperthreaded with more than one or two per core,
 the graph won't make it obvious which columns share a core.  All siblings
 are still given consecutively, unless forced into separate NUMA nodes with
 fakenuma settings.
 .P
-Machines above 140-150 CPUs may not fit on an 80-column terminal.
+Machines above circa 140 CPUs may not fit on an 80-column terminal.
+.P
+All utilization figures are \fBglobal\fR to the machine even if caused by
+something else than the program you run.
 .SH "SEE ALSO"
 .BR htop ,
 .BR dstat ,
