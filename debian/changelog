@@ -1,3 +1,10 @@
+topline (0.6-1) unstable; urgency=medium
+
+  * New upstream release:
+    + "topline -d some task" dumps the graph at the end of output.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Sun, 13 Apr 2025 23:35:14 +0200
+
 topline (0.5-1) unstable; urgency=medium
 
   * New upstream release:
